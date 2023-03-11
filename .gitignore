@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/ClickUp.Net.CLI/ClickUp.Net.CLI.csproj
+/ClickUp.Net.CLI/Program.cs
