@@ -1,6 +1,6 @@
 ﻿namespace ClickUp.Net
 {
-	internal class Settings
+	internal class ApiKeys
 	{
 		public string ClientID { get; set; }
 		public string ClientSecret { get; set; }

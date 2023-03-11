@@ -1,6 +1,5 @@
 ﻿using ClickUp.Net.Model;
 
-using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
@@ -14,7 +13,8 @@ namespace ClickUp.Net
 		private string Endpoint = "https://api.clickup.com/api/v2";
 		private string ApiV2Endpoint = "https://api.clickup.com/api/v2";
 		private string ApiMockServer = "https://a00fb6e0-339c-4201-972f-503b9932d17a.remockly.com";
-		
+		private ApiKeys ApiKeys = new ApiKeys();
+
 		public ClickUpApi()
 		{
 			var handler = new SocketsHttpHandler
