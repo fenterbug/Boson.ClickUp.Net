@@ -1,10 +1,6 @@
 ﻿using ClickUp.Net.Model;
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
-
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 
@@ -15,9 +11,10 @@ namespace ClickUp.Net
 		private readonly HttpClient client;
 		private string OAuthToken = string.Empty;
 		private string Token = string.Empty;
-
-		public IConfigurationRoot Configuration { get; set; }
-
+		private string Endpoint = "https://api.clickup.com/api/v2";
+		private string ApiV2Endpoint = "https://api.clickup.com/api/v2";
+		private string ApiMockServer = "https://a00fb6e0-339c-4201-972f-503b9932d17a.remockly.com";
+		
 		public ClickUpApi()
 		{
 			var handler = new SocketsHttpHandler
@@ -28,14 +25,27 @@ namespace ClickUp.Net
 
 			#region [ Load settings ]
 
-			var settingsPath = Path.GetDirectoryName(Assembly.GetAssembly(typeof(ClickUpApi)).Location);
-			var settingsFile = "appsettings.json";
-			var settingsData = File.ReadAllText(Path.Combine(settingsPath, settingsFile));
-			var settings = JsonSerializer.Deserialize<Settings>(settingsData);
-
-			Token = settings.PersonalToken;
+			//var settingsPath = Path.GetDirectoryName(Assembly.GetAssembly(typeof(ClickUpApi)).Location);
+			//var settingsFile = "appsettings.json";
+			//var settingsData = File.ReadAllText(Path.Combine(settingsPath, settingsFile));
+			//var settings = JsonSerializer.Deserialize<Settings>(settingsData);
+			//var settings = new Settings();
+			//settings.PersonalToken = "pk_57147343_2AJ8N0LLIOPU8FYDFFK2MYPQ1OD5L43L";
+			//Token = settings.PersonalToken;
 
 			#endregion [ Load settings ]
+		}
+
+		public ClickUpApi UsingMockServer()
+		{
+			Endpoint = ApiMockServer;
+			return this;
+		}
+
+		public ClickUpApi UsingV2Api()
+		{
+			Endpoint = ApiV2Endpoint;
+			return this;
 		}
 
 		#region [ Authorization ]
@@ -54,7 +64,7 @@ namespace ClickUp.Net
 			var response = new Response<User>();
 			client.DefaultRequestHeaders.Add("Authorization", Token);
 
-			var request = await client.GetAsync("https://api.clickup.com/api/v2/user");
+			var request = await client.GetAsync($"{Endpoint}/user");
 			var httpResponse = await request.Content.ReadAsStringAsync();
 
 			response.Error = JsonSerializer.Deserialize<ErrorResult>(httpResponse);
@@ -73,7 +83,7 @@ namespace ClickUp.Net
 			var response = new Response<IEnumerable<Team>>();
 			client.DefaultRequestHeaders.Add("Authorization", Token);
 
-			var request = await client.GetAsync("https://api.clickup.com/api/v2/team");
+			var request = await client.GetAsync($"{Endpoint}/team");
 			var httpResponse = await request.Content.ReadAsStringAsync();
 
 			response.Error = JsonSerializer.Deserialize<ErrorResult>(httpResponse);
@@ -153,7 +163,7 @@ namespace ClickUp.Net
 
 			#endregion [ Build parameter string ]
 
-			var request = await client.GetAsync($"https://api.clickup.com/api/v2/task/{task_id}/comment{cleanParms}");
+			var request = await client.GetAsync($"{Endpoint}/task/{task_id}/comment{cleanParms}");
 			var httpResponse = await request.Content.ReadAsStringAsync();
 
 			response.Error = JsonSerializer.Deserialize<ErrorResult>(httpResponse);
@@ -173,10 +183,16 @@ namespace ClickUp.Net
 		{
 			client.DefaultRequestHeaders.Add("Authorization", Token);
 			var ListId = "YOUR_list_id_PARAMETER";
-			var request = await client.GetAsync("https://api.clickup.com/api/v2/list/" + ListId + "/task?archived=false&page=0&order_by=string&reverse=true&subtasks=true&statuses=string&include_closed=true&assignees=string&tags=string&due_date_gt=0&due_date_lt=0&date_created_gt=0&date_created_lt=0&date_updated_gt=0&date_updated_lt=0&date_done_gt=0&date_done_lt=0&custom_fields=string");
+			var request = await client.GetAsync($"{Endpoint}/list/{ListId}/task?archived=false&page=0&order_by=string&reverse=true&subtasks=true&statuses=string&include_closed=true&assignees=string&tags=string&due_date_gt=0&due_date_lt=0&date_created_gt=0&date_created_lt=0&date_updated_gt=0&date_updated_lt=0&date_done_gt=0&date_done_lt=0&custom_fields=string");
 			var response = await request.Content.ReadAsStringAsync();
 
 			Console.WriteLine(response);
+		}
+
+		public ClickUpApi WithPersonalToken(string token)
+		{
+			Token = token;
+			return this;
 		}
 	}
 }
