@@ -179,6 +179,47 @@ namespace ClickUp.Net
 
 		#endregion [ Comments ]
 
+		#region [ Spaces ]
+		
+		public async Task<Response<IEnumerable<Space>>> GetSpaces (double team_id, bool archived = false)
+		{
+			var response = new Response<IEnumerable<Space>>();
+			client.DefaultRequestHeaders.Add("Authorization", Token);
+
+			#region [ Build parameter string ]
+
+			StringBuilder parmBuilder = new StringBuilder();
+
+			if (archived)
+			{
+				parmBuilder.Append("&archived=true");
+			}
+
+			string cleanParms = string.Empty;
+			if (parmBuilder.Length > 0)
+			{
+				// We've assumed an ampersand on all parms, but we really need to start with a question mark instead.
+				cleanParms = string.Concat("?", parmBuilder.ToString().AsSpan(1));
+			}
+
+			#endregion [ Build parameter string ]
+
+			var request = await client.GetAsync($"{Endpoint}/team/{team_id}/space{cleanParms}");
+			var httpResponse = await request.Content.ReadAsStringAsync();
+
+			response.Error = JsonSerializer.Deserialize<ErrorResult>(httpResponse);
+			if (!response.Error.IsError)
+			{
+				var myDeserializedClass = JsonSerializer.Deserialize<ClickUpContext>(httpResponse);
+				response.Value = myDeserializedClass.spaces;
+			}
+
+			//Console.WriteLine(httpResponse);
+			return response;
+		}
+
+		#endregion [ Spaces ]
+
 		public async Task GetUpdatedTasks()
 		{
 			client.DefaultRequestHeaders.Add("Authorization", Token);

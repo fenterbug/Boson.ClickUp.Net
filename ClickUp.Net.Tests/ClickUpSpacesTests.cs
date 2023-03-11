@@ -6,15 +6,20 @@ namespace ClickUp.Net.Tests
 	public class ClickUpSpacesTests
 	{
 		[TestMethod]
-		public async Task TestMethod1()
+		public async Task Can_Get_Spaces()
 		{
 			var api = new ClickUpApi().UsingMockServer().WithPersonalToken("NOT REQUIRED FOR MOCK SERVER");
-			var userResult = await api.GetAuthorizedUser();
+			var userResult = await api.GetSpaces(1);
 
 			if (userResult.Success)
 			{
-				var user = userResult.Value;
-				user.username.ShouldBe("John Doe");
+				//TODO: This is a weak test. It relies on the sample data coming from ClickUp. If ClickUp ever changes their sample data, this test will break;
+				var spaceList = userResult.Value;
+				spaceList.Count().ShouldBe(2);
+				foreach (var space in spaceList)
+				{
+					Convert.ToInt32(space.id).ShouldBeInRange(790, 791);
+				}
 			}
 		}
 	}
