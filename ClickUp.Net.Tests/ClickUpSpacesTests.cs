@@ -38,5 +38,13 @@ namespace ClickUp.Net.Tests
 				space.name.ShouldBe("Updated Space Name");
 			}
 		}
+
+		[TestMethod]
+		public async Task Can_Delete_A_Space()
+		{
+			var api = new ClickUpApi().UsingMockServer().WithPersonalToken("NOT REQUIRED FOR MOCK SERVER");
+			var result = await api.DeleteSpace(space_id: 1);
+			result.Success.ShouldBeTrue();
+		}
 	}
 }

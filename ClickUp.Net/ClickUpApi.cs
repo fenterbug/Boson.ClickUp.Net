@@ -219,7 +219,7 @@ namespace ClickUp.Net
 			return response;
 		}
 
-		public async Task<Response<Space>> GetSpace (double space_id)
+		public async Task<Response<Space>> GetSpace(double space_id)
 		{
 			var response = new Response<Space>();
 			client.DefaultRequestHeaders.Add("Authorization", Token);
@@ -234,6 +234,20 @@ namespace ClickUp.Net
 				Debug.WriteLine(httpResponse);
 				response.Value = myDeserializedClass;
 			}
+
+			//Console.WriteLine(httpResponse);
+			return response;
+		}
+
+		public async Task<Response> DeleteSpace(double space_id)
+		{
+			var response = new Response();
+			client.DefaultRequestHeaders.Add("Authorization", Token);
+
+			var request = await client.DeleteAsync($"{Endpoint}/space/{space_id}");
+			var httpResponse = await request.Content.ReadAsStringAsync();
+
+			response.Error = JsonSerializer.Deserialize<ErrorResult>(httpResponse);
 
 			//Console.WriteLine(httpResponse);
 			return response;
