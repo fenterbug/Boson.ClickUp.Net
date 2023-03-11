@@ -1,5 +1,6 @@
 ﻿using ClickUp.Net.Model;
 
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 
@@ -212,6 +213,26 @@ namespace ClickUp.Net
 			{
 				var myDeserializedClass = JsonSerializer.Deserialize<ClickUpContext>(httpResponse);
 				response.Value = myDeserializedClass.spaces;
+			}
+
+			//Console.WriteLine(httpResponse);
+			return response;
+		}
+
+		public async Task<Response<Space>> GetSpace (double space_id)
+		{
+			var response = new Response<Space>();
+			client.DefaultRequestHeaders.Add("Authorization", Token);
+
+			var request = await client.GetAsync($"{Endpoint}/space/{space_id}");
+			var httpResponse = await request.Content.ReadAsStringAsync();
+
+			response.Error = JsonSerializer.Deserialize<ErrorResult>(httpResponse);
+			if (!response.Error.IsError)
+			{
+				var myDeserializedClass = JsonSerializer.Deserialize<Space>(httpResponse);
+				Debug.WriteLine(httpResponse);
+				response.Value = myDeserializedClass;
 			}
 
 			//Console.WriteLine(httpResponse);
