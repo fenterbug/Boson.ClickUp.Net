@@ -37,7 +37,35 @@ namespace Boson.ClickUp.Net
 			#endregion [ Load settings ]
 		}
 
-		public ClickUpApi UsingMockServer()
+    public ClickUpApi(string clientId, string clientSecret, string personalToken)
+    {
+      var handler = new SocketsHttpHandler
+      {
+        PooledConnectionLifetime = TimeSpan.FromMinutes(15) // Recreate every 15 minutes
+      };
+      client = new HttpClient(handler);
+			
+			ApiKeys = new ApiKeys()
+			{
+				ClientID = clientId,
+				ClientSecret = clientSecret,
+				PersonalToken = personalToken
+			};
+
+      #region [ Load settings ]
+
+      //var settingsPath = Path.GetDirectoryName(Assembly.GetAssembly(typeof(ClickUpApi)).Location);
+      //var settingsFile = "appsettings.json";
+      //var settingsData = File.ReadAllText(Path.Combine(settingsPath, settingsFile));
+      //var settings = JsonSerializer.Deserialize<Settings>(settingsData);
+      //var settings = new Settings();
+      //settings.PersonalToken = "pk_57147343_2AJ8N0LLIOPU8FYDFFK2MYPQ1OD5L43L";
+      //Token = settings.PersonalToken;
+
+      #endregion [ Load settings ]
+    }
+
+    public ClickUpApi UsingMockServer()
 		{
 			Endpoint = ApiMockServer;
 			return this;
@@ -63,7 +91,7 @@ namespace Boson.ClickUp.Net
 		public async Task<Response<User>> GetAuthorizedUser()
 		{
 			var response = new Response<User>();
-			client.DefaultRequestHeaders.Add("Authorization", Token);
+			client.DefaultRequestHeaders.Add("Authorization", ApiKeys.PersonalToken);
 
 			var request = await client.GetAsync($"{Endpoint}/user");
 			var httpResponse = await request.Content.ReadAsStringAsync();
@@ -82,7 +110,7 @@ namespace Boson.ClickUp.Net
 		public async Task<Response<IEnumerable<Team>>> GetAuthorizedTeams()
 		{
 			var response = new Response<IEnumerable<Team>>();
-			client.DefaultRequestHeaders.Add("Authorization", Token);
+			client.DefaultRequestHeaders.Add("Authorization", ApiKeys.PersonalToken);
 
 			var request = await client.GetAsync($"{Endpoint}/team");
 			var httpResponse = await request.Content.ReadAsStringAsync();
@@ -106,7 +134,7 @@ namespace Boson.ClickUp.Net
 		//public async Task<Response<Type>> CreateTaskAttachment()
 		//{
 		//	var response = new Response<Type>();
-		//	client.DefaultRequestHeaders.Add("Authorization", Token);
+		//	client.DefaultRequestHeaders.Add("Authorization", ApiKeys.PersonalToken);
 
 		// Build parameter string
 
@@ -131,7 +159,7 @@ namespace Boson.ClickUp.Net
 		public async Task<Response<IEnumerable<Comment>>> GetTaskComments(string task_id, bool custom_task_ids = default, double team_id = default, int start = default, string start_id = default)
 		{
 			var response = new Response<IEnumerable<Comment>>();
-			client.DefaultRequestHeaders.Add("Authorization", Token);
+			client.DefaultRequestHeaders.Add("Authorization", ApiKeys.PersonalToken);
 
 			#region [ Build parameter string ]
 
@@ -185,7 +213,7 @@ namespace Boson.ClickUp.Net
 		public async Task<Response<IEnumerable<Space>>> GetSpaces (double team_id, bool archived = false)
 		{
 			var response = new Response<IEnumerable<Space>>();
-			client.DefaultRequestHeaders.Add("Authorization", Token);
+			client.DefaultRequestHeaders.Add("Authorization", ApiKeys.PersonalToken);
 
 			#region [ Build parameter string ]
 
@@ -222,7 +250,7 @@ namespace Boson.ClickUp.Net
 		public async Task<Response<Space>> GetSpace(double space_id)
 		{
 			var response = new Response<Space>();
-			client.DefaultRequestHeaders.Add("Authorization", Token);
+			client.DefaultRequestHeaders.Add("Authorization", ApiKeys.PersonalToken);
 
 			var request = await client.GetAsync($"{Endpoint}/space/{space_id}");
 			var httpResponse = await request.Content.ReadAsStringAsync();
@@ -242,7 +270,7 @@ namespace Boson.ClickUp.Net
 		public async Task<Response> DeleteSpace(double space_id)
 		{
 			var response = new Response();
-			client.DefaultRequestHeaders.Add("Authorization", Token);
+			client.DefaultRequestHeaders.Add("Authorization", ApiKeys.PersonalToken);
 
 			var request = await client.DeleteAsync($"{Endpoint}/space/{space_id}");
 			var httpResponse = await request.Content.ReadAsStringAsync();
@@ -257,7 +285,7 @@ namespace Boson.ClickUp.Net
 
 		public async Task GetUpdatedTasks()
 		{
-			client.DefaultRequestHeaders.Add("Authorization", Token);
+			client.DefaultRequestHeaders.Add("Authorization", ApiKeys.PersonalToken);
 			var ListId = "YOUR_list_id_PARAMETER";
 			var request = await client.GetAsync($"{Endpoint}/list/{ListId}/task?archived=false&page=0&order_by=string&reverse=true&subtasks=true&statuses=string&include_closed=true&assignees=string&tags=string&due_date_gt=0&due_date_lt=0&date_created_gt=0&date_created_lt=0&date_updated_gt=0&date_updated_lt=0&date_done_gt=0&date_done_lt=0&custom_fields=string");
 			var response = await request.Content.ReadAsStringAsync();
@@ -268,7 +296,20 @@ namespace Boson.ClickUp.Net
 		public ClickUpApi WithPersonalToken(string token)
 		{
 			Token = token;
+			ApiKeys.PersonalToken = token;
 			return this;
-		}
-	}
+    }
+
+    public ClickUpApi WithClientSecret(string secret)
+    {
+      ApiKeys.ClientSecret = secret;
+      return this;
+    }
+
+    public ClickUpApi WithClientId(string id)
+    {
+      ApiKeys.ClientID = id;
+      return this;
+    }
+  }
 }
