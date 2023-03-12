@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ClickUp.Net\ClickUp.Net.csproj" />
+    <ProjectReference Include="..\ClickUp.Net\Boson.ClickUp.Net.csproj" />
   </ItemGroup>
 
 </Project>

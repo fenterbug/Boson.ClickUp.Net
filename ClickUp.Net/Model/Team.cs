@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ClickUp.Net.Model
+namespace Boson.ClickUp.Net.Model
 {
 	public class Team
 	{

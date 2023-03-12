@@ -1,4 +1,4 @@
-﻿namespace ClickUp.Net
+﻿namespace Boson.ClickUp.Net
 {
 	public class ErrorResult
 	{

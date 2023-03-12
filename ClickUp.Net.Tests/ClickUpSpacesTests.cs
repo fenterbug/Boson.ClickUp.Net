@@ -1,6 +1,6 @@
 using Shouldly;
 
-namespace ClickUp.Net.Tests
+namespace Boson.ClickUp.Net.Tests
 {
 	[TestClass]
 	public class ClickUpSpacesTests

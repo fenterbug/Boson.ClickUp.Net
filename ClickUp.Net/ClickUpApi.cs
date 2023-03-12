@@ -1,10 +1,10 @@
-﻿using ClickUp.Net.Model;
+﻿using Boson.ClickUp.Net.Model;
 
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 
-namespace ClickUp.Net
+namespace Boson.ClickUp.Net
 {
 	public class ClickUpApi
 	{
