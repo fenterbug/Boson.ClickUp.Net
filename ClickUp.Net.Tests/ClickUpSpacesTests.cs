@@ -44,6 +44,24 @@ namespace Boson.ClickUp.Net.Tests
 		}
 
 		[TestMethod]
+		public async Task Can_Update_A_Space()
+		{
+			var oldSpace = new Space();
+			oldSpace.name = "Updated Space Name";
+			oldSpace.id = "790";
+
+			var api = new ClickUpApi().UsingMockServer().WithPersonalToken("NOT REQUIRED FOR MOCK SERVER");
+			var apiResult = await api.UpdateSpace(Convert.ToDouble(oldSpace.id), oldSpace);
+			apiResult.Success.ShouldBeTrue();
+
+			if (apiResult.Success)
+			{
+				var updatedSpace = apiResult.Value;
+				updatedSpace.name.ShouldBe(oldSpace.name);
+			}
+		}
+
+		[TestMethod]
 		public async Task Can_Get_A_Space()
 		{
 			var api = new ClickUpApi().UsingMockServer().WithPersonalToken("NOT REQUIRED FOR MOCK SERVER");
