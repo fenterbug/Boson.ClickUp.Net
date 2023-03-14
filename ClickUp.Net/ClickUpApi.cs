@@ -181,8 +181,8 @@ namespace Boson.ClickUp.Net
 		#endregion [ Comments ]
 
 		#region [ Spaces ]
-		
-		public async Task<Response<IEnumerable<Space>>> GetSpaces (double team_id, bool archived = false)
+
+		public async Task<Response<IEnumerable<Space>>> GetSpaces(double team_id, bool archived = false)
 		{
 			var response = new Response<IEnumerable<Space>>();
 			client.DefaultRequestHeaders.Add("Authorization", Token);
@@ -275,7 +275,7 @@ namespace Boson.ClickUp.Net
 			return response;
 		}
 
-		public async Task<Response<Space>> UpdateSpace (double space_id, Space space)
+		public async Task<Response<Space>> UpdateSpace(double space_id, Space space)
 		{
 			var response = new Response<Space>();
 			client.DefaultRequestHeaders.Add("Authorization", Token);
