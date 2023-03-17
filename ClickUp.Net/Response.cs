@@ -3,7 +3,7 @@
 	public class Response
 	{
 		public ErrorResult Error { get; set; }
-		public bool Success => !Error.IsError;
+		public bool Success => Error is null ? true : !Error.IsError;
 	}
 
 	public class Response<T> : Response
