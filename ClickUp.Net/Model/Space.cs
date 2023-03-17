@@ -8,6 +8,6 @@
 		public List<Status> statuses { get; set; }
 		public bool multiple_assignees { get; set; }
 		public Features features { get; set; }
+		public bool archived { get; set; }
 	}
-
 }

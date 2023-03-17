@@ -191,10 +191,54 @@ namespace Boson.ClickUp.Net
 			return Unwrap<Space>(response);
 		}
 
+		public async Task<Response<Space>> CreateSpace(double team_id, Space space)
+		{
+			var response = new Response<Space>();
+			client.DefaultRequestHeaders.Add("Authorization", Token);
+
+			var serializedData = JsonSerializer.Serialize(space);
+			var postData = new StringContent(serializedData, Encoding.UTF8, "application/json");
+
+			var request = await client.PostAsync($"{Endpoint}/team/{team_id}/space", postData);
+			var httpResponse = await request.Content.ReadAsStringAsync();
+
+			response.Error = JsonSerializer.Deserialize<ErrorResult>(httpResponse);
+			if (!response.Error.IsError)
+			{
+				var myDeserializedClass = JsonSerializer.Deserialize<Space>(httpResponse);
+				response.Value = myDeserializedClass;
+			}
+
+			//Console.WriteLine(httpResponse);
+			return response;
+		}
+
 		public async Task<Response> DeleteSpace(double space_id)
 		{
 			var response = await MakeCall(HttpMethod.Delete, $"space/{space_id}");
 			return Unwrap(response);
+		}
+
+		public async Task<Response<Space>> UpdateSpace(double space_id, Space space)
+		{
+			var response = new Response<Space>();
+			client.DefaultRequestHeaders.Add("Authorization", Token);
+
+			var serializedData = JsonSerializer.Serialize(space);
+			var postData = new StringContent(serializedData, Encoding.UTF8, "application/json");
+
+			var request = await client.PutAsync($"{Endpoint}/space/{space_id}", postData);
+			var httpResponse = await request.Content.ReadAsStringAsync();
+
+			response.Error = JsonSerializer.Deserialize<ErrorResult>(httpResponse);
+			if (!response.Error.IsError)
+			{
+				var myDeserializedClass = JsonSerializer.Deserialize<Space>(httpResponse);
+				response.Value = myDeserializedClass;
+			}
+
+			//Console.WriteLine(httpResponse);
+			return response;
 		}
 
 		#endregion [ Spaces ]

@@ -1,3 +1,5 @@
+using Boson.ClickUp.Net.Model;
+
 using Shouldly;
 
 namespace Boson.ClickUp.Net.Tests
@@ -20,6 +22,42 @@ namespace Boson.ClickUp.Net.Tests
 				{
 					Convert.ToInt32(space.id).ShouldBeInRange(790, 791);
 				}
+			}
+		}
+
+		[TestMethod]
+		public async Task Can_Create_A_Space()
+		{
+			var newSpace = new Space();
+			newSpace.name = "New Space Name";
+			double mockTeam = 1;
+
+			var api = new ClickUpApi().UsingMockServer().WithPersonalToken("NOT REQUIRED FOR MOCK SERVER");
+			var apiResult = await api.CreateSpace(mockTeam, newSpace);
+			apiResult.Success.ShouldBeTrue();
+
+			if (apiResult.Success)
+			{
+				var createdSpace = apiResult.Value;
+				createdSpace.name.ShouldBe(newSpace.name);
+			}
+		}
+
+		[TestMethod]
+		public async Task Can_Update_A_Space()
+		{
+			var oldSpace = new Space();
+			oldSpace.name = "Updated Space Name";
+			oldSpace.id = "790";
+
+			var api = new ClickUpApi().UsingMockServer().WithPersonalToken("NOT REQUIRED FOR MOCK SERVER");
+			var apiResult = await api.UpdateSpace(Convert.ToDouble(oldSpace.id), oldSpace);
+			apiResult.Success.ShouldBeTrue();
+
+			if (apiResult.Success)
+			{
+				var updatedSpace = apiResult.Value;
+				updatedSpace.name.ShouldBe(oldSpace.name);
 			}
 		}
 
