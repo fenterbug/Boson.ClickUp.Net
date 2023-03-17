@@ -2,28 +2,18 @@
 
 using Microsoft.AspNetCore.WebUtilities;
 
-using System;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using System.Web;
-
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Boson.ClickUp.Net
 {
 	public class ClickUpApi
 	{
-		private readonly HttpClient client;
-		private readonly string OAuthToken = string.Empty;
-		private string Token = string.Empty;
-		private string Endpoint = "https://api.clickup.com/api/v2";
-		private readonly string ApiV2Endpoint = "https://api.clickup.com/api/v2";
 		private readonly string ApiMockServer = "https://a00fb6e0-339c-4201-972f-503b9932d17a.remockly.com";
-		private readonly ApiKeys ApiKeys = new();
+		private readonly string ApiV2Endpoint = "https://api.clickup.com/api/v2";
+		private readonly HttpClient client;
+		private string Endpoint = "https://api.clickup.com/api/v2";
+		private string Token = string.Empty;
 
 		public ClickUpApi()
 		{
@@ -32,18 +22,6 @@ namespace Boson.ClickUp.Net
 				PooledConnectionLifetime = TimeSpan.FromMinutes(15) // Recreate every 15 minutes
 			};
 			client = new HttpClient(handler);
-
-			#region [ Load settings ]
-
-			//var settingsPath = Path.GetDirectoryName(Assembly.GetAssembly(typeof(ClickUpApi)).Location);
-			//var settingsFile = "appsettings.json";
-			//var settingsData = File.ReadAllText(Path.Combine(settingsPath, settingsFile));
-			//var settings = JsonSerializer.Deserialize<Settings>(settingsData);
-			//var settings = new Settings();
-			//settings.PersonalToken = "pk_57147343_2AJ8N0LLIOPU8FYDFFK2MYPQ1OD5L43L";
-			//Token = settings.PersonalToken;
-
-			#endregion [ Load settings ]
 		}
 
 		public ClickUpApi UsingMockServer()
@@ -58,6 +36,12 @@ namespace Boson.ClickUp.Net
 			return this;
 		}
 
+		public ClickUpApi WithPersonalToken(string token)
+		{
+			Token = token;
+			return this;
+		}
+
 		#region [ Authorization ]
 
 		//TODO: GetAccessToken()
@@ -69,45 +53,19 @@ namespace Boson.ClickUp.Net
 		//	Console.WriteLine(response);
 		//}
 
-		public async Task<Response<User>> GetAuthorizedUser()
-		{
-			var response = await MakeCall(HttpMethod.Get, $"user");
-			return Unwrap(response, r => r.user);
-		}
-
 		public async Task<Response<IEnumerable<Team>>> GetAuthorizedTeams()
 		{
 			var response = await MakeCall(HttpMethod.Get, "team");
 			return Unwrap<IEnumerable<Team>>(response, r => r.teams);
 		}
 
+		public async Task<Response<User>> GetAuthorizedUser()
+		{
+			var response = await MakeCall(HttpMethod.Get, $"user");
+			return Unwrap(response, r => r.user);
+		}
+
 		#endregion [ Authorization ]
-
-		#region [ Attachments ]
-
-		//TODO: CreateTaskAttachment()
-		//public async Task<Response<Type>> CreateTaskAttachment()
-		//{
-		//	var response = new Response<Type>();
-		//	client.DefaultRequestHeaders.Add("Authorization", Token);
-
-		// Build parameter string
-
-		//	var request = await client.GetAsync("ENDPOINT");
-		//	var httpResponse = await request.Content.ReadAsStringAsync();
-
-		//	response.Error = JsonSerializer.Deserialize<ErrorResult>(httpResponse);
-		//	if (!response.Error.IsError)
-		//	{
-		//		var myDeserializedClass = JsonSerializer.Deserialize<ClickUpContext>(httpResponse);
-		//		response.Value = myDeserializedClass.Type;
-		//	}
-
-		//	//Console.WriteLine(response);
-		//	return response;
-		//}
-
-		#endregion [ Attachments ]
 
 		#region [ Comments ]
 
@@ -129,6 +87,24 @@ namespace Boson.ClickUp.Net
 
 		#region [ Spaces ]
 
+		public async Task<Response<Space>> CreateSpace(double team_id, Space space)
+		{
+			var response = await MakeCall(HttpMethod.Post, $"team/{team_id}/space", space);
+			return Unwrap<Space>(response);
+		}
+
+		public async Task<Response> DeleteSpace(double space_id)
+		{
+			var response = await MakeCall(HttpMethod.Delete, $"space/{space_id}");
+			return Unwrap(response);
+		}
+
+		public async Task<Response<Space>> GetSpace(double space_id)
+		{
+			var response = await MakeCall(HttpMethod.Get, $"space/{space_id}");
+			return Unwrap<Space>(response);
+		}
+
 		public async Task<Response<IEnumerable<Space>>> GetSpaces(double team_id, bool archived = false)
 		{
 			var parameters = new Dictionary<string, object>
@@ -139,6 +115,16 @@ namespace Boson.ClickUp.Net
 			var response = await MakeCall(HttpMethod.Get, $"team/{team_id}/space", parameters);
 			return Unwrap<IEnumerable<Space>>(response, r => r.spaces);
 		}
+
+		public async Task<Response<Space>> UpdateSpace(double space_id, Space space)
+		{
+			var response = await MakeCall(HttpMethod.Put, $"space/{space_id}", space);
+			return Unwrap<Space>(response);
+		}
+
+		#endregion [ Spaces ]
+
+		#region [ Unwrap ]
 
 		private static Response Unwrap(Response<string> wrapped)
 		{
@@ -185,80 +171,9 @@ namespace Boson.ClickUp.Net
 			return unwrapped;
 		}
 
-		public async Task<Response<Space>> GetSpace(double space_id)
-		{
-			var response = await MakeCall(HttpMethod.Get, $"space/{space_id}");
-			return Unwrap<Space>(response);
-		}
+		#endregion [ Unwrap ]
 
-		public async Task<Response<Space>> CreateSpace(double team_id, Space space)
-		{
-			var response = new Response<Space>();
-			client.DefaultRequestHeaders.Add("Authorization", Token);
-
-			var serializedData = JsonSerializer.Serialize(space);
-			var postData = new StringContent(serializedData, Encoding.UTF8, "application/json");
-
-			var request = await client.PostAsync($"{Endpoint}/team/{team_id}/space", postData);
-			var httpResponse = await request.Content.ReadAsStringAsync();
-
-			response.Error = JsonSerializer.Deserialize<ErrorResult>(httpResponse);
-			if (!response.Error.IsError)
-			{
-				var myDeserializedClass = JsonSerializer.Deserialize<Space>(httpResponse);
-				response.Value = myDeserializedClass;
-			}
-
-			//Console.WriteLine(httpResponse);
-			return response;
-		}
-
-		public async Task<Response> DeleteSpace(double space_id)
-		{
-			var response = await MakeCall(HttpMethod.Delete, $"space/{space_id}");
-			return Unwrap(response);
-		}
-
-		public async Task<Response<Space>> UpdateSpace(double space_id, Space space)
-		{
-			var response = new Response<Space>();
-			client.DefaultRequestHeaders.Add("Authorization", Token);
-
-			var serializedData = JsonSerializer.Serialize(space);
-			var postData = new StringContent(serializedData, Encoding.UTF8, "application/json");
-
-			var request = await client.PutAsync($"{Endpoint}/space/{space_id}", postData);
-			var httpResponse = await request.Content.ReadAsStringAsync();
-
-			response.Error = JsonSerializer.Deserialize<ErrorResult>(httpResponse);
-			if (!response.Error.IsError)
-			{
-				var myDeserializedClass = JsonSerializer.Deserialize<Space>(httpResponse);
-				response.Value = myDeserializedClass;
-			}
-
-			//Console.WriteLine(httpResponse);
-			return response;
-		}
-
-		#endregion [ Spaces ]
-
-		public async Task GetUpdatedTasks()
-		{
-			throw new NotImplementedException();
-			client.DefaultRequestHeaders.Add("Authorization", Token);
-			var ListId = "YOUR_list_id_PARAMETER";
-			var request = await client.GetAsync($"{Endpoint}/list/{ListId}/task?archived=false&page=0&order_by=string&reverse=true&subtasks=true&statuses=string&include_closed=true&assignees=string&tags=string&due_date_gt=0&due_date_lt=0&date_created_gt=0&date_created_lt=0&date_updated_gt=0&date_updated_lt=0&date_done_gt=0&date_done_lt=0&custom_fields=string");
-			var response = await request.Content.ReadAsStringAsync();
-
-			Console.WriteLine(response);
-		}
-
-		public ClickUpApi WithPersonalToken(string token)
-		{
-			Token = token;
-			return this;
-		}
+		#region [ MakeCall ]
 
 		private async Task<Response<string>> MakeCall(HttpMethod method, string ApiCall, Dictionary<string, object>? parameters = default)
 		{
@@ -276,6 +191,7 @@ namespace Boson.ClickUp.Net
 				case HttpMethod m when m == HttpMethod.Delete:
 					request = await client.DeleteAsync(TrueEndpoint);
 					break;
+
 				case HttpMethod n when n == HttpMethod.Get:
 				default:
 					request = await client.GetAsync(TrueEndpoint);
@@ -305,6 +221,7 @@ namespace Boson.ClickUp.Net
 				case HttpMethod m when m == HttpMethod.Post:
 					request = await client.PostAsync(TrueEndpoint, data);
 					break;
+
 				case HttpMethod m when m == HttpMethod.Put:
 					request = await client.PutAsync(TrueEndpoint, data);
 					break;
@@ -319,5 +236,7 @@ namespace Boson.ClickUp.Net
 
 			return response;
 		}
+
+		#endregion [ MakeCall ]
 	}
 }

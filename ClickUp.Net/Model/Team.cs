@@ -4,10 +4,9 @@ namespace Boson.ClickUp.Net.Model
 {
 	public class Team
 	{
-		public string id { get; set; }
-		public string name { get; set; }
-		public string color { get; set; }
 		public string avatar { get; set; }
+		public string color { get; set; }
+		public string id { get; set; }
 		public List<Member> members { get; set; }
 
 		[JsonIgnore]
@@ -21,5 +20,7 @@ namespace Boson.ClickUp.Net.Model
 				}
 			}
 		}
+
+		public string name { get; set; }
 	}
 }
