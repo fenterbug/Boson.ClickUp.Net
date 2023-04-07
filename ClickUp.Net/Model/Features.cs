@@ -35,22 +35,22 @@
 
 	public class Features
 	{
-		public Checklists checklists { get; set; }
-		public CustomFields custom_fields { get; set; }
-		public CustomItems custom_items { get; set; }
-		public DependencyWarning dependency_warning { get; set; }
-		public DueDates due_dates { get; set; }
-		public Emails emails { get; set; }
-		public Milestones milestones { get; set; }
-		public MultipleAssignees multiple_assignees { get; set; }
-		public Points points { get; set; }
-		public Portfolios portfolios { get; set; }
-		public RemapDependencies remap_dependencies { get; set; }
-		public Sprints sprints { get; set; }
-		public Tags tags { get; set; }
-		public TimeEstimates time_estimates { get; set; }
-		public TimeTracking time_tracking { get; set; }
-		public Zoom zoom { get; set; }
+		public Checklists checklists => new();
+		public CustomFields custom_fields => new();
+		public CustomItems custom_items => new();
+		public DependencyWarning dependency_warning => new();
+		public DueDates due_dates => new();
+		public Emails emails => new();
+		public Milestones milestones => new();
+		public MultipleAssignees multiple_assignees => new();
+		public Points points => new();
+		public Portfolios portfolios => new();
+		public RemapDependencies remap_dependencies => new();
+		public Sprints sprints => new();
+		public Tags tags => new();
+		public TimeEstimates time_estimates => new();
+		public TimeTracking time_tracking => new();
+		public Zoom zoom => new();
 	}
 
 	public class Milestones

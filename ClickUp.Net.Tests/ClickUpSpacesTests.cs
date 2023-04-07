@@ -28,8 +28,7 @@ namespace Boson.ClickUp.Net.Tests
 		[TestMethod]
 		public async Task Can_Create_A_Space()
 		{
-			var newSpace = new Space();
-			newSpace.name = "New Space Name";
+			var newSpace = new Space("New Space Name", false);
 			double mockTeam = 1;
 
 			var api = new ClickUpApi().UsingMockServer().WithPersonalToken("NOT REQUIRED FOR MOCK SERVER");
@@ -46,9 +45,10 @@ namespace Boson.ClickUp.Net.Tests
 		[TestMethod]
 		public async Task Can_Update_A_Space()
 		{
-			var oldSpace = new Space();
-			oldSpace.name = "Updated Space Name";
-			oldSpace.id = "790";
+			var oldSpace = new Space("Updated Space Name", false)
+			{
+				id = "790"
+			};
 
 			var api = new ClickUpApi().UsingMockServer().WithPersonalToken("NOT REQUIRED FOR MOCK SERVER");
 			var apiResult = await api.UpdateSpace(Convert.ToDouble(oldSpace.id), oldSpace);

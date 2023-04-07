@@ -83,11 +83,21 @@ namespace Boson.ClickUp.Net
 			return Unwrap<IEnumerable<Comment>>(response, r => r.comments);
 		}
 
-		#endregion [ Comments ]
+        #endregion [ Comments ]
 
-		#region [ Spaces ]
+        #region [ Lists ]
 
-		public async Task<Response<Space>> CreateSpace(double team_id, Space space)
+		public async Task<Response<IEnumerable<List>>> GetLists (int folderId)
+		{
+			var response = await MakeCall(HttpMethod.Get, $"folder/{folderId}/list?archived=false");
+			return Unwrap<IEnumerable<List>>(response, r => r.lists);
+        }
+
+        #endregion [ Lists ]
+
+        #region [ Spaces ]
+
+        public async Task<Response<Space>> CreateSpace(double team_id, Space space)
 		{
 			var response = await MakeCall(HttpMethod.Post, $"team/{team_id}/space", space);
 			return Unwrap<Space>(response);
