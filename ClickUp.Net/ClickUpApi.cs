@@ -101,9 +101,9 @@ namespace Boson.ClickUp.Net
 
 		#region [ Roles ]
 
-		public async Task<Response<IEnumerable<Custom_Roles>>> GetCustomRoles(double teamId)
+		public async Task<Response<IEnumerable<Custom_Roles>>> GetCustomRoles(double team_id)
 		{
-			var response = await MakeCall(HttpMethod.Get, $"team/{teamId}/customroles?include_members=true");
+			var response = await MakeCall(HttpMethod.Get, $"team/{team_id}/customroles?include_members=true");
 			return Unwrap(response, r => r.custom_roles.AsEnumerable());
 		}
 
