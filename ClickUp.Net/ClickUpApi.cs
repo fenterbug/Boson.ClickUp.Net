@@ -15,7 +15,9 @@ namespace Boson.ClickUp.Net
 		private string Endpoint = "https://api.clickup.com/api/v2";
 		private string Token = string.Empty;
 
-		public ClickUpApi()
+        #region [ Constructors and Setup ]
+
+        public ClickUpApi()
 		{
 			var handler = new SocketsHttpHandler
 			{
@@ -42,18 +44,20 @@ namespace Boson.ClickUp.Net
 			return this;
 		}
 
-		#region [ Authorization ]
+        #endregion [ Constructors and Setup ]
 
-		//TODO: GetAccessToken()
-		//public async Task GetAccessToken()
-		//{
-		//	var request = await client.PostAsync($"https://api.clickup.com/api/v2/oauth/token?client_id={ClientID}&client_secret={ClientSecret}&code={PersonalToken}", null);
-		//	var response = await request.Content.ReadAsStringAsync();
+        #region [ Authorization ]
 
-		//	Console.WriteLine(response);
-		//}
+        //TODO: GetAccessToken()
+        //public async Task GetAccessToken()
+        //{
+        //	var request = await client.PostAsync($"https://api.clickup.com/api/v2/oauth/token?client_id={ClientID}&client_secret={ClientSecret}&code={PersonalToken}", null);
+        //	var response = await request.Content.ReadAsStringAsync();
 
-		public async Task<Response<IEnumerable<Team>>> GetAuthorizedTeams()
+        //	Console.WriteLine(response);
+        //}
+
+        public async Task<Response<IEnumerable<Team>>> GetAuthorizedTeams()
 		{
 			var response = await MakeCall(HttpMethod.Get, "team");
 			return Unwrap<IEnumerable<Team>>(response, r => r.teams);
@@ -93,7 +97,17 @@ namespace Boson.ClickUp.Net
 			return Unwrap<IEnumerable<List>>(response, r => r.lists);
         }
 
-        #endregion [ Lists ]
+		#endregion [ Lists ]
+
+		#region [ Roles ]
+
+		public async Task<Response<IEnumerable<Custom_Roles>>> GetCustomRoles(double teamId)
+		{
+			var response = await MakeCall(HttpMethod.Get, $"team/{teamId}/customroles?include_members=true");
+			return Unwrap(response, r => r.custom_roles.AsEnumerable());
+		}
+
+        #endregion [ Roles ]
 
         #region [ Spaces ]
 
