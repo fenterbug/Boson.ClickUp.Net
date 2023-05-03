@@ -7,5 +7,6 @@
         public List<Space> spaces { get; set; }
         public List<Team> teams { get; set; }
         public User user { get; set; }
+        public Custom_Roles[] custom_roles { get; set; }
     }
 }
