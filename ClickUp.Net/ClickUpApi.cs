@@ -208,20 +208,13 @@ namespace Boson.ClickUp.Net
 				TrueEndpoint = QueryHelpers.AddQueryString(TrueEndpoint, cleanParms);
 			}
 
-			HttpResponseMessage? request;
-			client.DefaultRequestHeaders.Add("Authorization", Token);
-			switch (method)
-			{
-				case HttpMethod m when m == HttpMethod.Delete:
-					request = await client.DeleteAsync(TrueEndpoint);
-					break;
-
-				case HttpMethod n when n == HttpMethod.Get:
-				default:
-					request = await client.GetAsync(TrueEndpoint);
-					break;
-			}
-			var httpResponse = await request.Content.ReadAsStringAsync();
+            client.DefaultRequestHeaders.Add("Authorization", Token);
+            HttpResponseMessage? request = method switch
+            {
+                HttpMethod m when m == HttpMethod.Delete => await client.DeleteAsync(TrueEndpoint),
+                _ => await client.GetAsync(TrueEndpoint),
+            };
+            var httpResponse = await request.Content.ReadAsStringAsync();
 
 			var response = new Response<string>
 			{
@@ -240,17 +233,12 @@ namespace Boson.ClickUp.Net
 
 			HttpResponseMessage? request = null;
 			client.DefaultRequestHeaders.Add("Authorization", Token);
-			switch (method)
-			{
-				case HttpMethod m when m == HttpMethod.Post:
-					request = await client.PostAsync(TrueEndpoint, data);
-					break;
-
-				case HttpMethod m when m == HttpMethod.Put:
-					request = await client.PutAsync(TrueEndpoint, data);
-					break;
-			}
-			var httpResponse = await request.Content.ReadAsStringAsync();
+            request = method switch
+            {
+                HttpMethod m when m == HttpMethod.Post => await client.PostAsync(TrueEndpoint, data),
+                _ => await client.PutAsync(TrueEndpoint, data),
+            };
+            var httpResponse = await request.Content.ReadAsStringAsync();
 
 			var response = new Response<string>
 			{
